@@ -40,47 +40,52 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
             {
                 throw new NotSupportedException("Rhs only support literal constant.");
             }
-
-            if (!double.TryParse(rhs.Value, out var rhsVal))
-            {
-                throw new NotSupportedException("Rhs must be a number.");
-            }
-            
             var fieldName = lhs.Fields.First().Property.Name;
             if ('A' <= fieldName[0] && fieldName[0] <= 'Z')
             {
                 fieldName = (char)(fieldName[0] - 'A' + 'a') + fieldName[1..];
             }
 
-            
-            search.Range(c =>
+            if (expression.Operator == ComparisonOperator.Equals)
             {
-                c.Field(new Field(fieldName));
-                switch (expression.Operator)
+                search.Term(c =>
                 {
-                    case ComparisonOperator.Equals:
-                        c.GreaterThanOrEquals(rhsVal);
-                        c.LessThanOrEquals(rhsVal);
-                        break;
-                    case ComparisonOperator.GreaterThan:
-                        c.GreaterThan(rhsVal);
-                        break;
-                    case ComparisonOperator.GreaterOrEqual:
-                        c.GreaterThanOrEquals(rhsVal);
-                        break;
-                    case ComparisonOperator.LessThan:
-                        c.LessThan(rhsVal);
-                        break;
-                    case ComparisonOperator.LessOrEqual:
-                        c.LessThanOrEquals(rhsVal);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    c.Field(new Field(fieldName));
+                    c.Value(rhs.Value);
+                    return c;
+                });
+            } else {
+                if (!double.TryParse(rhs.Value, out var rhsVal))
+                {
+                    throw new NotSupportedException("Rhs must be a number.");
                 }
- 
-                return c;
-            });
-            
+                
+                search.Range(c =>
+                {
+                    c.Field(new Field(fieldName));
+                    switch (expression.Operator)
+                    {
+                        case ComparisonOperator.Equals:
+                            break;
+                        case ComparisonOperator.GreaterThan:
+                            c.GreaterThan(rhsVal);
+                            break;
+                        case ComparisonOperator.GreaterOrEqual:
+                            c.GreaterThanOrEquals(rhsVal);
+                            break;
+                        case ComparisonOperator.LessThan:
+                            c.LessThan(rhsVal);
+                            break;
+                        case ComparisonOperator.LessOrEqual:
+                            c.LessThanOrEquals(rhsVal);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+     
+                    return c;
+                });
+            }
             return search;
         }
 
