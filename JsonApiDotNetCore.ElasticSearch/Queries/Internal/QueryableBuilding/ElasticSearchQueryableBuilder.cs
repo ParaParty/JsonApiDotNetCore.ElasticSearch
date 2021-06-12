@@ -45,10 +45,17 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
             {
                 throw new NotSupportedException("Rhs must be a number.");
             }
- 
+            
+            var fieldName = lhs.Fields.First().Property.Name;
+            if ('A' <= fieldName[0] && fieldName[0] <= 'Z')
+            {
+                fieldName = (char)(fieldName[0] - 'A' + 'a') + fieldName[1..];
+            }
+
+            
             search.Range(c =>
             {
-                c.Field(new Field(lhs.Fields.First().Property.Name));
+                c.Field(new Field(fieldName));
                 switch (expression.Operator)
                 {
                     case ComparisonOperator.Equals:
