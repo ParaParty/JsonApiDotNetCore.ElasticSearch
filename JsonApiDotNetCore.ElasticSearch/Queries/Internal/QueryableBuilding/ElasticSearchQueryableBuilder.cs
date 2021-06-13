@@ -33,7 +33,15 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
             // {
             //     searchDescriptor.Sort(s => Visit(_layer.Filter, s));
             // }
-
+            
+             if (_layer.Pagination != null)
+             {
+                 searchDescriptor.Take(_layer.Pagination.PageSize.Value);
+                 searchDescriptor.Skip(_layer.Pagination.PageSize.Value * (_layer.Pagination.PageNumber.OneBasedValue - 1));
+             }
+            
+            
+            
             return searchDescriptor;
         }
 
@@ -56,6 +64,16 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
             typeof(decimal), typeof(decimal?)
         };
 
+        private string GetPropName(string s)
+        {
+            var ret = s;
+            if ('A' <= ret[0] && ret[0] <= 'Z')
+            {
+                ret = (char) (ret[0] - 'A' + 'a') + ret[1..];
+            }
+            return ret;
+        }
+
         public override QueryContainerDescriptor<TResource> VisitComparison(ComparisonExpression expression,
             QueryContainerDescriptor<TResource> search)
         {
@@ -64,18 +82,20 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
                 throw new NotSupportedException("Lhs only support field name.");
             }
 
+            // TODO 属性链
+            if (lhs.Fields.Count != 1)
+            {
+                throw new NotSupportedException("Lhs not support field chain.");
+            }
+
             if (expression.Right is not LiteralConstantExpression rhs)
             {
                 throw new NotSupportedException("Rhs only support literal constant.");
             }
 
             var propType = lhs.Fields.First().Property.PropertyType;
-            var fieldName = lhs.Fields.First().Property.Name;
-            if ('A' <= fieldName[0] && fieldName[0] <= 'Z')
-            {
-                fieldName = (char) (fieldName[0] - 'A' + 'a') + fieldName[1..];
-            }
-
+            var fieldName = GetPropName(lhs.Fields.First().Property.Name);
+            
             if (fieldName == "id")
             {
                 fieldName = long.TryParse(rhs.Value, out var rhsVal) ? "databaseId" : $"_{fieldName}";
@@ -300,5 +320,50 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
 
             return search;
         }
+
+
+        public override QueryContainerDescriptor<TResource> VisitMatchText(MatchTextExpression expression,
+            QueryContainerDescriptor<TResource> search)
+        {
+            // TODO 属性链
+            if (expression.TargetAttribute.Fields.Count != 1)
+            {
+                throw new NotSupportedException("Lhs not support field chain.");
+            }
+            
+            var fieldName = GetPropName(expression.TargetAttribute.Fields.First().Property.Name);
+
+            search.Match(c =>
+            {
+                c.Field(fieldName);
+                c.Fuzziness(Fuzziness.Auto);
+                c.Query(expression.TextValue.Value);
+                return c;
+            });
+
+            return search;
+        }
+
+        public override QueryContainerDescriptor<TResource> VisitEqualsAnyOf(EqualsAnyOfExpression expression,
+            QueryContainerDescriptor<TResource> search)
+        {
+            // TODO 属性链
+            if (expression.TargetAttribute.Fields.Count != 1)
+            {
+                throw new NotSupportedException("Lhs not support field chain.");
+            }
+            
+            var fieldName = GetPropName(expression.TargetAttribute.Fields.First().Property.Name);
+
+            search.Terms(c =>
+            {
+                c.Field(fieldName);
+                c.Terms(expression.Constants.Select<LiteralConstantExpression, string>(s => s.Value).ToArray());
+                return c;
+            });
+            
+            return search;
+        }
+
     }
 }
