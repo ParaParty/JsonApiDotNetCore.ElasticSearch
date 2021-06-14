@@ -285,6 +285,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
             
             var fieldName = PropertyHelper.GetPropName(expression.TargetAttribute.Fields.First().Property.Name);
 
+            // TODO 对 StartsWith EndsWith 进行特化。使得使用 StartsWith 时在文档开头匹配到的结果优先度比在文档末尾匹配到的结果高。
             return search.Match(c =>
             {
                 c.Field(fieldName);
@@ -354,7 +355,17 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
         
         public override QueryContainer VisitNot(NotExpression expression, QueryContainerDescriptor<TResource> search)
         {
-            throw new NotSupportedException("Unary operator not is not support.");
+            throw new NotSupportedException("Unary operator \"not\" is not supported.");
+        }
+        
+        public override QueryContainer VisitResourceFieldChain(ResourceFieldChainExpression expression, QueryContainerDescriptor<TResource> search)
+        {
+            throw new NotSupportedException("FieldChain not supported.");
+        }
+        
+        public override QueryContainer VisitCollectionNotEmpty(CollectionNotEmptyExpression expression, QueryContainerDescriptor<TResource> search)
+        {
+            throw new NotSupportedException("Relationship operator not supported.");
         }
 
     }
