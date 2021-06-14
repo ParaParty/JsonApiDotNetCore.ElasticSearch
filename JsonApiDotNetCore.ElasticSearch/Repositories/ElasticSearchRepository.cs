@@ -43,8 +43,8 @@ namespace JsonApiDotNetCore.ElasticSearch.Repositories
         {
             var result = _nestProvider.Client.Search<TResource>(s =>
             {
-                var builder = new ElasticSearchQueryableBuilder<TResource>(_nestProvider ,layer);
-                return builder.Build(s);
+                var builder = new ElasticSearchQueryableBuilder<TResource>(_nestProvider);
+                return builder.Query(s, layer);
             });
 
             var resultSet = result.Documents;
@@ -54,7 +54,15 @@ namespace JsonApiDotNetCore.ElasticSearch.Repositories
         
         public Task<int> CountAsync(FilterExpression topFilter, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            var result = _nestProvider.Client.Search<TResource>(s =>
+            {
+                var builder = new ElasticSearchQueryableBuilder<TResource>(_nestProvider);
+                return builder.Count(s, topFilter);
+            });
+
+            var resultCount = result.HitsMetadata.Total.Value > 0x7FFFFFFF ? 0x7FFFFFFF : (int) result.HitsMetadata.Total.Value;
+
+            return Task.FromResult(resultCount);
         }
 
         public Task<TResource> GetForCreateAsync(TId id, CancellationToken cancellationToken)

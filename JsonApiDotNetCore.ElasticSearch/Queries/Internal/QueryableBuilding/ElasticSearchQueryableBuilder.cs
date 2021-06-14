@@ -1,4 +1,7 @@
-﻿using JsonApiDotNetCore.ElasticSearch.Services;
+﻿using System;
+using System.Reflection;
+using JsonApiDotNetCore.ElasticSearch.Attributes;
+using JsonApiDotNetCore.ElasticSearch.Services;
 using JsonApiDotNetCore.Queries;
 using JsonApiDotNetCore.Queries.Expressions;
 using Nest;
@@ -9,39 +12,71 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
         ElasticSearchQueryableBuilder<TResource> where TResource : class
     {
         private readonly IJsonApiElasticSearchProvider _nestService;
-        private readonly QueryLayer _layer;
 
-        public ElasticSearchQueryableBuilder(IJsonApiElasticSearchProvider nestService, QueryLayer layer)
+        public ElasticSearchQueryableBuilder(IJsonApiElasticSearchProvider nestService)
         {
             _nestService = nestService;
-            _layer = layer;
         }
 
-        public SearchDescriptor<TResource> Build(SearchDescriptor<TResource> searchDescriptor)
+        private string GetIndexName()
         {
-            searchDescriptor.Index($"{_nestService.Prefix}log_chat_general"); // TODO
+            var indexName = "";
+            if (System.Attribute.IsDefined(typeof(TResource), typeof(ResourceIndexNameAttribute)))
+            {
+                var attrs = System.Attribute.GetCustomAttributes(typeof(TResource), typeof(ResourceIndexNameAttribute));
+                for (int i = 0; i < attrs.Length; i++)
+                {
+                    indexName = (attrs[i] as ResourceIndexNameAttribute)?.IndexName ?? "";
+                }
+            }
+            
+            if (indexName == null || indexName.Trim().Length == 0){
+                throw new ArgumentException("Resource didn't set resource index name.");
+            }
 
-            if (_layer.Filter != null)
+            return indexName;
+        }
+
+        public SearchDescriptor<TResource> Query(SearchDescriptor<TResource> searchDescriptor, QueryLayer layer)
+        {
+            var indexName = GetIndexName();
+            searchDescriptor.Index($"{_nestService.Prefix}{indexName}"); // TODO
+
+            if (layer.Filter != null)
             {
                 var builder = new ElasticSearchConstraintsBuilder<TResource>();
-                searchDescriptor.Query(s => builder.Visit(_layer.Filter, s));
+                searchDescriptor.Query(s => builder.Visit(layer.Filter, s));
             }
 
-            if (_layer.Sort != null)
+            if (layer.Sort != null)
             {
                 var builder = new ElasticSearchSortsBuilder<TResource>();
-                searchDescriptor.Sort(s => builder.Visit(_layer.Sort, s));
+                searchDescriptor.Sort(s => builder.Visit(layer.Sort, s));
             }
 
-            if (_layer.Pagination != null)
+            if (layer.Pagination != null)
             {
-                searchDescriptor.Take(_layer.Pagination.PageSize.Value);
+                searchDescriptor.Take(layer.Pagination.PageSize.Value);
                 searchDescriptor.Skip(
-                    _layer.Pagination.PageSize.Value *
-                    (_layer.Pagination.PageNumber.OneBasedValue - 1)
+                    layer.Pagination.PageSize.Value *
+                    (layer.Pagination.PageNumber.OneBasedValue - 1)
                 );
             }
 
+            return searchDescriptor;
+        }
+
+        public SearchDescriptor<TResource> Count(SearchDescriptor<TResource> searchDescriptor, FilterExpression topFilter)
+        {
+            var indexName = GetIndexName();
+            searchDescriptor.Index($"{_nestService.Prefix}{indexName}"); // TODO
+
+            if (topFilter != null)
+            {
+                var builder = new ElasticSearchConstraintsBuilder<TResource>();
+                searchDescriptor.Query(s => builder.Visit(topFilter, s));
+            }
+            
             return searchDescriptor;
         }
     }
