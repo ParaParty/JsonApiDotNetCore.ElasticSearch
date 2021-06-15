@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Reflection;
+using System.Linq;
 using JsonApiDotNetCore.ElasticSearch.Attributes;
 using JsonApiDotNetCore.ElasticSearch.Services;
 using JsonApiDotNetCore.Queries;
@@ -50,8 +50,13 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
 
             if (layer.Sort != null)
             {
-                var builder = new ElasticSearchSortsBuilder<TResource>();
-                searchDescriptor.Sort(s => builder.Visit(layer.Sort, s));
+                if (layer.Sort.Elements.Count != 1 ||
+                    layer.Sort.Elements.First().TargetAttribute.Fields.Count != 1 ||
+                    layer.Sort.Elements.First().TargetAttribute.Fields.First().Property.Name.ToLower() != "id")
+                {
+                    var builder = new ElasticSearchSortsBuilder<TResource>();
+                    searchDescriptor.Sort(s => builder.Visit(layer.Sort, s));
+                }
             }
 
             if (layer.Pagination != null)
