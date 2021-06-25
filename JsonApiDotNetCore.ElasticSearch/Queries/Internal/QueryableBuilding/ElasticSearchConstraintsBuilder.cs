@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using JsonApiDotNetCore.ElasticSearch.Utils;
@@ -285,14 +285,24 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
             
             var fieldName = PropertyHelper.GetPropName(expression.TargetAttribute.Fields.First().Property.Name);
 
-            // TODO 对 StartsWith EndsWith 进行特化。使得使用 StartsWith 时在文档开头匹配到的结果优先度比在文档末尾匹配到的结果高。
-            return search.Match(c =>
+            return expression.MatchKind switch
             {
-                c.Field(fieldName);
-                c.Fuzziness(Fuzziness.Auto);
-                c.Query(expression.TextValue.Value);
-                return c;
-            });
+                TextMatchKind.Contains => search.Match(c =>
+                {
+                    c.Field(fieldName);
+                    c.Fuzziness(Fuzziness.Auto);
+                    c.Query(expression.TextValue.Value);
+                    return c;
+                }),
+                TextMatchKind.StartsWith => search.MatchPhrasePrefix(c =>
+                {
+                    c.Field(fieldName);
+                    c.Query(expression.TextValue.Value);
+                    return c;
+                }),
+                TextMatchKind.EndsWith => throw new NotSupportedException("EndsWith not supported."),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         public override QueryContainer VisitEqualsAnyOf(EqualsAnyOfExpression expression,
