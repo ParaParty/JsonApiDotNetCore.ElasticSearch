@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JsonApiDotNetCore.ElasticSearch.Utils;
@@ -355,7 +355,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
         
         public override QueryContainer VisitNot(NotExpression expression, QueryContainerDescriptor<TResource> search)
         {
-            throw new NotSupportedException("Unary operator \"not\" is not supported.");
+            return !Visit(expression.Child, search);
         }
         
         public override QueryContainer VisitResourceFieldChain(ResourceFieldChainExpression expression, QueryContainerDescriptor<TResource> search)
