@@ -294,7 +294,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
                     c.Query(expression.TextValue.Value);
                     return c;
                 }),
-                TextMatchKind.StartsWith => search.MatchPhrasePrefix(c =>
+                TextMatchKind.StartsWith => search.MatchBoolPrefix(c =>
                 {
                     c.Field(fieldName);
                     c.Query(expression.TextValue.Value);
