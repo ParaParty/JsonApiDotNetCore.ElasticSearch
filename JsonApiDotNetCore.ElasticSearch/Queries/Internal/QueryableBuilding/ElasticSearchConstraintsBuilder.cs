@@ -186,7 +186,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
         {
             if (!DateTime.TryParse(rhs.Value, out var rhsVal))
             {
-                throw new NotSupportedException("Rhs must be a number.");
+                throw new NotSupportedException("Rhs must be a datetime.");
             }
 
             if (expression.Operator == ComparisonOperator.Equals)
