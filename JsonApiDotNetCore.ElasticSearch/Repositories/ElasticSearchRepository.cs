@@ -20,18 +20,20 @@ namespace JsonApiDotNetCore.ElasticSearch.Repositories
     {
         private readonly IJsonApiElasticSearchProvider _nestProvider;
         private readonly ITargetedFields _targetedFields;
-        private readonly IResourceContextProvider _resourceContextProvider;
+        private readonly IResourceGraph _resourceGraph;
         private readonly IResourceFactory _resourceFactory;
         private readonly IEnumerable<IQueryConstraintProvider> _constraintProviders;
+        private readonly IResourceDefinitionAccessor _resourceDefinitionAccessor;
 
-        public ElasticSearchRepository(IJsonApiElasticSearchProvider nestProvider, ITargetedFields targetedFields, IResourceContextProvider resourceContextProvider,
-            IResourceFactory resourceFactory, IEnumerable<IQueryConstraintProvider> constraintProviders)
+        public ElasticSearchRepository(IJsonApiElasticSearchProvider nestProvider, ITargetedFields targetedFields, IResourceGraph resourceGraph, IResourceFactory resourceFactory,
+            IEnumerable<IQueryConstraintProvider> constraintProviders, IResourceDefinitionAccessor resourceDefinitionAccessor)
         {
             _nestProvider = nestProvider;
             _targetedFields = targetedFields;
-            _resourceContextProvider = resourceContextProvider;
+            _resourceGraph = resourceGraph;
             _resourceFactory = resourceFactory;
             _constraintProviders = constraintProviders;
+            _resourceDefinitionAccessor = resourceDefinitionAccessor;
 
             if (typeof(TId) != typeof(string))
             {
@@ -104,19 +106,6 @@ namespace JsonApiDotNetCore.ElasticSearch.Repositories
             CancellationToken cancellationToken)
         {
             throw new System.NotSupportedException();
-        }
-    }
-
-    /// <summary>
-    /// Do not use. This type exists solely to produce a proper error message when trying to use MongoDB with a non-string Id.
-    /// </summary>
-    public sealed class ElasticSearchRepository<TResource> : ElasticSearchRepository<TResource, int>, IResourceRepository<TResource>
-        where TResource : class, IIdentifiable<int>
-    {
-        public ElasticSearchRepository(IJsonApiElasticSearchProvider nestProvider, ITargetedFields targetedFields, IResourceContextProvider resourceContextProvider,
-            IResourceFactory resourceFactory, IEnumerable<IQueryConstraintProvider> constraintProviders)
-            : base(nestProvider, targetedFields, resourceContextProvider, resourceFactory, constraintProviders)
-        {
         }
     }
 }

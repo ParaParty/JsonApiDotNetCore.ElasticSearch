@@ -51,8 +51,8 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
             if (layer.Sort != null)
             {
                 if (layer.Sort.Elements.Count != 1 ||
-                    layer.Sort.Elements.First().TargetAttribute.Fields.Count != 1 ||
-                    layer.Sort.Elements.First().TargetAttribute.Fields.First().Property.Name.ToLower() != "id")
+                    layer.Sort.Elements.First().TargetAttribute!.Fields.Count != 1 ||
+                    layer.Sort.Elements.First().TargetAttribute!.Fields.First().Property.Name.ToLower() != "id")
                 {
                     var builder = new ElasticSearchSortsBuilder<TResource>();
                     searchDescriptor.Sort(s => builder.Visit(layer.Sort, s));
@@ -61,7 +61,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
 
             if (layer.Pagination != null)
             {
-                searchDescriptor.Take(layer.Pagination.PageSize.Value);
+                searchDescriptor.Take(layer.Pagination.PageSize!.Value);
                 searchDescriptor.Skip(
                     layer.Pagination.PageSize.Value *
                     (layer.Pagination.PageNumber.OneBasedValue - 1)

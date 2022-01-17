@@ -305,7 +305,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
             };
         }
 
-        public override QueryContainer VisitEqualsAnyOf(EqualsAnyOfExpression expression,
+        public override QueryContainer VisitAny(AnyExpression expression,
             QueryContainerDescriptor<TResource> search)
         {
             // TODO 属性链
@@ -373,7 +373,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
             throw new NotSupportedException("FieldChain not supported.");
         }
         
-        public override QueryContainer VisitCollectionNotEmpty(CollectionNotEmptyExpression expression, QueryContainerDescriptor<TResource> search)
+        public override QueryContainer VisitHas(HasExpression expression, QueryContainerDescriptor<TResource> search)
         {
             throw new NotSupportedException("Relationship operator not supported.");
         }

@@ -1,9 +1,14 @@
 ﻿namespace JsonApiDotNetCore.ElasticSearch.Utils
 {
-    public class PropertyHelper
+    public static class PropertyHelper
     {
         public static string GetPropName(string s)
         {
+            if (s.Length <= 1)
+            {
+                return s.ToLower();
+            }
+
             var ret = s;
             if ('A' <= ret[0] && ret[0] <= 'Z')
             {

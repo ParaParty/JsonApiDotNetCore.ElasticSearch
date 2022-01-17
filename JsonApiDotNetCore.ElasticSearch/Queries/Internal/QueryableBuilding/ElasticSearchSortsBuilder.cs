@@ -12,7 +12,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
         public override SortDescriptor<TResource> VisitSortElement(SortElementExpression expression, SortDescriptor<TResource> search)
         {
             // TODO 属性链
-            if (expression.TargetAttribute.Fields.Count != 1)
+            if (expression.TargetAttribute == null || expression.TargetAttribute.Fields.Count != 1)
             {
                 throw new NotSupportedException("Lhs not support field chain.");
             }
