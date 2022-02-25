@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{B7D35386-1281-4807-B7CE-69655D34C820}") = "JsonApiDotNetCore.ElasticSearch", "JsonApiDotNetCore.ElasticSearch\JsonApiDotNetCore.ElasticSearch.csproj", "{7B929377-645C-496E-BB16-52983D4BE102}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7B929377-645C-496E-BB16-52983D4BE102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B929377-645C-496E-BB16-52983D4BE102}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B929377-645C-496E-BB16-52983D4BE102}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B929377-645C-496E-BB16-52983D4BE102}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9CB9F3F4-99EA-490D-BE5A-BD3EC7ACFAFF}
+	EndGlobalSection
+EndGlobal
