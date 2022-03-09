@@ -54,11 +54,10 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
             
             if (fieldName == "id")
             {
-                fieldName = long.TryParse(rhs.Value, out var rhsVal) ? "databaseId" : $"_{fieldName}";
+                fieldName = "_id";
             }
 
-            // 这个 database Id 指的是关系型数据库里这一条记录所对应的数据库自增主键
-            if (_integerType.Contains(propType) || fieldName == "databaseId")
+            if (_integerType.Contains(propType))
             {
                 return IntegerQueryContainerDescriptor(expression, search, lhs, rhs, fieldName);
             }

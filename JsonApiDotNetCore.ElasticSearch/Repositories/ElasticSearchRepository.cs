@@ -15,6 +15,11 @@ using Nest;
 
 namespace JsonApiDotNetCore.ElasticSearch.Repositories
 {
+    /// <summary>
+    /// JsonApi.Net ElasticSearch Repository
+    ///
+    /// Only read implemented.
+    /// </summary>
     public class ElasticSearchRepository<TResource, TId> : IResourceRepository<TResource, TId>
         where TResource : class, IIdentifiable<TId>
     {

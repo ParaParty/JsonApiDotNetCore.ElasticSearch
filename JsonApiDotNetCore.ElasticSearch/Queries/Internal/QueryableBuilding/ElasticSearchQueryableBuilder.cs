@@ -8,8 +8,7 @@ using Nest;
 
 namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
 {
-    public class
-        ElasticSearchQueryableBuilder<TResource> where TResource : class
+    public class ElasticSearchQueryableBuilder<TResource> where TResource : class
     {
         private readonly IJsonApiElasticSearchProvider _nestService;
 
