@@ -17,6 +17,11 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
             _nestService = nestService;
         }
 
+        /// <summary>
+        /// Get final index name for searching in ElasticSearch.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         private string GetIndexName()
         {
             var indexName = "";
@@ -28,18 +33,19 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
                     indexName = (attrs[i] as ResourceIndexNameAttribute)?.IndexName ?? "";
                 }
             }
-            
-            if (indexName == null || indexName.Trim().Length == 0){
+
+            if (string.IsNullOrWhiteSpace(indexName))
+            {
                 throw new ArgumentException("Resource didn't set resource index name.");
             }
 
-            return indexName;
+            return $"{_nestService.Prefix}{indexName}";
         }
 
         public SearchDescriptor<TResource> Query(SearchDescriptor<TResource> searchDescriptor, QueryLayer layer)
         {
             var indexName = GetIndexName();
-            searchDescriptor.Index($"{_nestService.Prefix}{indexName}"); // TODO
+            searchDescriptor.Index(indexName);
 
             if (layer.Filter != null)
             {
