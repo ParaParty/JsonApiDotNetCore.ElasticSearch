@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -72,7 +73,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Repositories
             return Task.FromResult(resultCount);
         }
 
-        public Task<TResource> GetForCreateAsync(TId id, CancellationToken cancellationToken)
+        public Task<TResource> GetForCreateAsync(Type resourceClrType, TId id, CancellationToken cancellationToken)
         {
             throw new System.NotSupportedException();
         }
@@ -92,7 +93,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Repositories
             throw new System.NotSupportedException();
         }
 
-        public Task DeleteAsync(TId id, CancellationToken cancellationToken)
+        public Task DeleteAsync(TResource resourceFromDatabase, TId id, CancellationToken cancellationToken)
         {
             throw new System.NotSupportedException();
         }
@@ -102,7 +103,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Repositories
             throw new System.NotSupportedException();
         }
 
-        public Task AddToToManyRelationshipAsync(TId primaryId, ISet<IIdentifiable> secondaryResourceIds, CancellationToken cancellationToken)
+        public Task AddToToManyRelationshipAsync(TResource leftResource, TId leftId, ISet<IIdentifiable> rightResourceIds, CancellationToken cancellationToken)
         {
             throw new System.NotSupportedException();
         }
