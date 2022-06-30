@@ -79,7 +79,7 @@ namespace JsonApiDotNetCore.ElasticSearch.Queries.Internal.QueryableBuilding
         public SearchDescriptor<TResource> Count(SearchDescriptor<TResource> searchDescriptor, FilterExpression topFilter)
         {
             var indexName = GetIndexName();
-            searchDescriptor.Index($"{_nestService.Prefix}{indexName}"); // TODO
+            searchDescriptor.Index(indexName);
 
             if (topFilter != null)
             {
